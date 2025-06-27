@@ -1,27 +1,46 @@
 name: Python application CI
+# Имя workflow, отображается в GitHub Actions
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+# События, при которых запускается workflow:
+# - при push в main
+# - при создании pull request в main
 
 jobs:
   test:
+  # Определение задачи (job) с именем "test"
 
     runs-on: ubuntu-latest
+    # Виртуальная машина Ubuntu, запускаемая GitHub для выполнения шагов
 
     steps:
+    # Последовательность шагов в рамках job
+
     - name: Checkout repo
       uses: actions/checkout@v3
+    # Шаг для клонирования содержимого репозитория в рабочую директорию
 
     - name: Set up Python 3.9
       uses: actions/setup-python@v4
       with:
         python-version: 3.9
+    # Установка Python 3.9 в виртуальной машине
 
-    - name: Install pytest
-      run: pip install pytest
+    - name: Upgrade pip and install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest flake8
+    # Обновляем pip и устанавливаем зависимости: pytest (для тестов) и flake8 (для линтинга)
 
-    - name: Run tests
+    - name: Run linter (flake8)
+      run: flake8 app.py test_app.py
+    # Запуск линтера для проверки качества и стиля кода в файлах app.py и test_app.py
+
+    - name: Run unit tests
       run: pytest test_app.py
+    # Запуск юнит-тестов с помощью pytest
+
